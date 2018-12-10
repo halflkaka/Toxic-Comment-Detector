@@ -89,27 +89,37 @@ def index():
 
 @app.route("/chart", methods=["GET"])
 def getdata():
+    res = []
     data = []
+    bar = []
     for key in count:
         data.append({'key': key, 'value': count[key]})
-    response = jsonify(data)
-    print(response)
+        bar.append({'x': key, 'y': count[key]})
+    res.append(data)
+    res.append(bar)
+    response = jsonify(res)
+    print("resp: "+response)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 @app.route("/refresh", methods=["GET"])
 def refresh():
     start()
+    res = []
     data = []
+    bar = []
     for key in count:
         data.append({'key': key, 'value': count[key]})
-    response = jsonify(data)
+        bar.append({'x': key, 'y': count[key]})
+    # response = jsonify(data)
+    res.append(data)
+    res.append(bar)
+    response = jsonify(res)
     print(response)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 if __name__ == "__main__":
-	app.run()
-
+    app.run()
 
 
