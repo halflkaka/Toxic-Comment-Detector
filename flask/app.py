@@ -75,8 +75,13 @@ def start():
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
 
+<<<<<<< HEAD
     twitterStream = Stream(auth, listener(time_limit=5))
     twitterStream.sample(languages=['en'])
+=======
+	twitterStream = Stream(auth, listener(time_limit=5))
+	twitterStream.sample(languages=['en'])
+>>>>>>> f84276c3f534a71168aeca9284ff8162756106e3
 
 def getdata():
     res = []
