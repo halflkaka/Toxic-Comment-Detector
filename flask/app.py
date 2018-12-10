@@ -74,7 +74,7 @@ def start():
 	auth.set_access_token(atoken, asecret)
 
 	twitterStream = Stream(auth, listener(time_limit=5))
-	twitterStream.sample()
+	twitterStream.sample(languages=['en'])
 
 # if __name__ == "__main__":
 # 	start()
