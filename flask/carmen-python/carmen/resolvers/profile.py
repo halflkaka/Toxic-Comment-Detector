@@ -38,8 +38,8 @@ class ProfileResolver(AbstractResolver):
         for alias in aliases:
             if alias in aliases_already_added:
                 continue
-            if alias in self.location_name_to_location:
-                warnings.warn('Duplicate location name "%s"' % alias)
+            #if alias in self.location_name_to_location:
+                #warnings.warn('Duplicate location name "%s"' % alias)
             else:
                 self.location_name_to_location[alias] = location
             # Additionally add a normalized version of the alias

@@ -97,13 +97,16 @@ def getdata():
     return response
 
 def getLocation(data):
+    '''
     output_file = "tweet.json"
     input_file = "tweetLocation.json"
     with open(output_file, 'w') as fo:
         json.dump(data, fo)
-    if cli.main(output_file, input_file):
-        with open(input_file, 'r') as fi:
-            result = json.load(fi)
+    '''
+    ok, result = cli.main(data)
+    if ok:
+        #with open(input_file, 'r') as fi:
+            #result = json.load(fi)
         return result['location']
     else:
         return {}
