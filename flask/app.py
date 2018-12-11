@@ -24,7 +24,7 @@ colors = ['#6dc0ec', '#62acd4', '#5799bc', '#4c86a5', '#41738d', '#366076', '#2b
 count = {'severe_toxic':0, 'obscene':0, 'threat':0, 'insult':0, 'identity_hate':0}
 users = {'severe_toxic':[], 'obscene':[], 'threat':[], 'insult':[], 'identity_hate':[]}
 county = {}
-countState = {'New York': {'name': 'New York', 'values':{'label': "Toxic comment", 'val': 10}, 'color': colors[1]}} #{'New York': {name: NY, values:{}, color: ""}}
+countState = {}#{'New York': {'name': 'New York', 'values':[{'label': "Toxic comment", 'val': 10}], 'color': colors[1]}}
 
 with open("vesc", "rb") as v:
     vec = pickle.load(v)
@@ -37,7 +37,7 @@ with open("model_param2", "rb") as file2:
 
 class listener(StreamListener):
 
-    def __init__(self, time_limit=5):
+    def __init__(self, time_limit=20):
         self.start_time = time.time()
         self.limit = time_limit
         super(listener, self).__init__()
@@ -69,7 +69,7 @@ class listener(StreamListener):
                         index = countState[state]['val']
 
                         if index < 35:
-                            color = colors[index/5]
+                            color = colors[index//5]
                         else:
                             color = colors[7]
 
@@ -100,7 +100,7 @@ def start():
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
 
-    twitterStream = Stream(auth, listener(time_limit=5))
+    twitterStream = Stream(auth, listener(time_limit=20))
     twitterStream.sample(languages=['en'])
 
 def getdata():
@@ -121,7 +121,7 @@ def getdata():
         states.append(countState[key])
 
     res.append(states)
-    print(states)
+    print("states" + str(states))
     response = jsonify(res)
     return response
 
