@@ -21,6 +21,7 @@ label_cols = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_
 
 count = {'severe_toxic':0, 'obscene':0, 'threat':0, 'insult':0, 'identity_hate':0}
 users = {'severe_toxic':[], 'obscene':[], 'threat':[], 'insult':[], 'identity_hate':[]}
+county = {}
 
 with open("vesc", "rb") as v:
     vec = pickle.load(v)
@@ -42,7 +43,7 @@ class listener(StreamListener):
         if (time.time() - self.start_time) < self.limit:
             all_data = json.loads(data)
             location = getLocation(all_data)
-            print (location)
+
             try:
                 tweet = all_data["text"]
                 data = [tweet]
@@ -53,6 +54,13 @@ class listener(StreamListener):
                     preds[i] = model1[i].predict_proba(vectorized_data.multiply(model2[i]))[:,1]
                 if (preds[0] > 0.5):
                     print("it is toxic")
+                    if (location.get('country') == "United States"):
+                        state = location.get('state')
+                        if (state in county):
+                            county[state] += 1
+                        else:
+                            county[state] = 1
+                        print(county)
                     for i in range(1, len(preds)):
                         if (preds[i] > 0.3):
                             count[label_cols[i]] += 1

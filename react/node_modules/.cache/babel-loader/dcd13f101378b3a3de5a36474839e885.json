@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { default as quadtree } from \"./src/quadtree\";","map":null,"metadata":{},"sourceType":"module"}
