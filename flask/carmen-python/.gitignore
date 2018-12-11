@@ -1,0 +1,10 @@
+*.py[cdo]
+
+# Packages
+*.egg
+*.egg-info
+build
+dist
+
+# Documentation
+doc/_build

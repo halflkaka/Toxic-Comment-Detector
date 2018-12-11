@@ -11,6 +11,9 @@ import re, string
 import pandas as pd, numpy as np
 import json
 import time
+import pathConfig
+import cli
+import sys
 
 def tokenize(s): return re_tok.sub(r' \1 ', s).split()
 re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
@@ -38,8 +41,8 @@ class listener(StreamListener):
     def on_data(self, data):
         if (time.time() - self.start_time) < self.limit:
             all_data = json.loads(data)
-            # print(all_data)
-            
+            location = getLocation(all_data)
+            print (location)
             try:
                 tweet = all_data["text"]
                 data = [tweet]
@@ -92,8 +95,18 @@ def getdata():
     res.append(blacklist)
     response = jsonify(res)
     return response
-# if __name__ == "__main__":
-#   start()
+
+def getLocation(data):
+    output_file = "tweet.json"
+    input_file = "tweetLocation.json"
+    with open(output_file, 'w') as fo:
+        json.dump(data, fo)
+    if cli.main(output_file, input_file):
+        with open(input_file, 'r') as fi:
+            result = json.load(fi)
+        return result['location']
+    else:
+        return {}
 
 start()
 
