@@ -1,0 +1,1 @@
+{"ast":null,"code":"export { default as path } from \"./src/path\";","map":null,"metadata":{},"sourceType":"module"}
