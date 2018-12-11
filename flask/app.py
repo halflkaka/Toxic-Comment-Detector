@@ -19,9 +19,12 @@ def tokenize(s): return re_tok.sub(r' \1 ', s).split()
 re_tok = re.compile(f'([{string.punctuation}“”¨«»®´·º½¾¿¡§£₤‘’])')
 label_cols = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
 
+colors = ['#6dc0ec', '#62acd4', '#5799bc', '#4c86a5', '#41738d', '#366076', '#2b4c5e', '#203946']
+
 count = {'severe_toxic':0, 'obscene':0, 'threat':0, 'insult':0, 'identity_hate':0}
 users = {'severe_toxic':[], 'obscene':[], 'threat':[], 'insult':[], 'identity_hate':[]}
 county = {}
+countState = {'New York': {'name': 'New York', 'values':{'label': "Toxic comment", 'val': 10}, 'color': colors[1]}} #{'New York': {name: NY, values:{}, color: ""}}
 
 with open("vesc", "rb") as v:
     vec = pickle.load(v)
@@ -56,11 +59,22 @@ class listener(StreamListener):
                     print("it is toxic")
                     if (location.get('country') == "United States"):
                         state = location.get('state')
-                        if (state in county):
-                            county[state] += 1
+                        if (state in countState):
+                            countState[state]['val'] += 1
                         else:
-                            county[state] = 1
-                        print(county)
+                            countState[state] = {'label': "Toxic comment", 'val': 0}
+                        ll = []
+                        ll.append(countState[state])
+
+                        index = countState[state]['val']
+
+                        if index < 35:
+                            color = colors[index/5]
+                        else:
+                            color = colors[7]
+
+                        county[state] = {'name': state, 'values': ll, 'color': color}
+
                     for i in range(1, len(preds)):
                         if (preds[i] > 0.3):
                             count[label_cols[i]] += 1
@@ -94,6 +108,7 @@ def getdata():
     data = []
     bar = []
     blacklist = []
+    states = []
     for key in count:
         data.append({'key': key, 'value': count[key]})
         bar.append({'x': key, 'y': count[key]})
@@ -101,6 +116,12 @@ def getdata():
     res.append(bar)
     blacklist.append(users)
     res.append(blacklist)
+
+    for key in countState:
+        states.append(countState[key])
+
+    res.append(states)
+    print(states)
     response = jsonify(res)
     return response
 
