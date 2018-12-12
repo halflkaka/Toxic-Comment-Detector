@@ -4,6 +4,7 @@ import { Button, Grid, Row, Col} from 'react-bootstrap';
 import ReactTable from 'react-table'
 import '../node_modules/react-table/react-table.css'
 import './App.css'
+import ReactUSA from 'react-usa';
 // import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 // import '../node_modules/react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 
@@ -23,10 +24,16 @@ export default class App extends React.Component {
           { x: 'B', y: 200 },
           { x: 'C', y: 50 }
         ],
-        blacklist:[{'obscene':[]}]
+        blacklist:[{'obscene':[]}],
+        states: [{
+          name: "New York",
+          values: [{label: "Electoral Votes", val: 29}],
+          color: "#475C96"
+        }]
       };
       this.refresh = this.refresh.bind(this);
   }
+
   refresh() {
     this.setState({
       isLoaded : false
@@ -40,7 +47,8 @@ export default class App extends React.Component {
               isLoaded: true,
               items: result[0],
               bar: result[1],
-              blacklist: result[2]
+              blacklist: result[2],
+              states: result[3]
             });
           },
           (error) => {
@@ -55,17 +63,16 @@ export default class App extends React.Component {
       this.refresh();
   }
   render () {
-    const { error, isLoaded, items, bar, blacklist } = this.state;
-    console.log(blacklist)
+    const { error, isLoaded, items, bar, blacklist , states} = this.state;
     const columns = [{
       Header: 'Name',
       accessor: 'name',
-      width: 500, // String-based value accessors!
+      width: 250, // String-based value accessors!
       height: 500
     }, {
       Header: 'Tweet',
       accessor:'tweet',
-      width: 500,
+      width: 700,
       height: 500
     }];
     const customStyle = {
@@ -73,13 +80,20 @@ export default class App extends React.Component {
         margin: 10
       }
     };
+    const mapboxAccessToken = "pk.eyJ1IjoiaGFsZmxrYWthIiwiYSI6ImNqcGs2Y3ppYjAwNDQzeHFsemR4dnN5MXMifQ.cMuKGmhr9-TD-6cILcRldA"
+    const mapboxType = "streets";
+    const position = [37.0902, -95.7129];
+    const zoom = 3;
+    const stateStyle = { weight: 1.5, color: '#FFF', dashArray: '1', fillOpacity: 1 }
+    const stateHoverStyle = { weight: 5, color: '#FFF', dashArray: '1', fillOpacity: 1 }
+
     if (error) {
         return <div>Error: {error.message}</div>;
     } else {
       console.log("draw...");
       console.log(items);
       return (
-        <div>
+        <div className="grid">
       <Grid>
          <Row>
          <Col md={3}/>
@@ -146,6 +160,21 @@ export default class App extends React.Component {
             {this.state.selected? 
               <ReactTable defaultPageSize={10} minRows={10} showPageSizeOptions={false} data={blacklist['0'][this.state.selected]} columns={columns}/>
               : ''}
+          </Row>
+          <Row>
+          <Col md={4}/>
+          <Col md={11}>
+            <ReactUSA
+               mapboxAccessToken={mapboxAccessToken}
+               mapHeight="500px"
+               mapWidth="100%"
+               className="container"
+               mapboxType="light"
+               stateStyle={stateStyle}
+               stateHoverStyle={stateHoverStyle}
+               data={states}
+              />
+              </Col>
           </Row>
       </Grid>
       </div>

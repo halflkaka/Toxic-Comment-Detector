@@ -37,7 +37,7 @@ with open("model_param2", "rb") as file2:
 
 class listener(StreamListener):
 
-    def __init__(self, time_limit=20):
+    def __init__(self, time_limit=60):
         self.start_time = time.time()
         self.limit = time_limit
         super(listener, self).__init__()
@@ -46,6 +46,8 @@ class listener(StreamListener):
         if (time.time() - self.start_time) < self.limit:
             all_data = json.loads(data)
             location = getLocation(all_data)
+            if (type(location) != type(count)):
+                print(location.country)
 
             try:
                 tweet = all_data["text"]
@@ -57,26 +59,34 @@ class listener(StreamListener):
                     preds[i] = model1[i].predict_proba(vectorized_data.multiply(model2[i]))[:,1]
                 if (preds[0] > 0.5):
                     print("it is toxic")
-                    if (location.get('country') == "United States"):
-                        state = location.get('state')
+                    if (type(location) != type(count) and location.country == 'United States'):
+                        state = location.state
                         if (state in countState):
                             countState[state]['val'] += 1
                         else:
-                            countState[state] = {'label': "Toxic comment", 'val': 0}
+                            countState[state] = {'label': "Toxic comment", 'val': 1}
                         ll = []
                         ll.append(countState[state])
 
                         index = countState[state]['val']
 
-                        if index < 35:
-                            color = colors[index//5]
+                        if index < 14:
+                            color = colors[index//2]
                         else:
                             color = colors[7]
 
                         county[state] = {'name': state, 'values': ll, 'color': color}
 
                     for i in range(1, len(preds)):
-                        if (preds[i] > 0.3):
+                        if (i == 2 and preds[i] > 0.8):
+                            count[label_cols[i]] += 1
+                            user = {'name': all_data["user"]["name"], "tweet": all_data["text"]}
+                            users[label_cols[i]].append(user)
+                        elif (i != 2 and i != 4 and preds[i] > 0.1):
+                            count[label_cols[i]] += 1
+                            user = {'name': all_data["user"]["name"], "tweet": all_data["text"]}
+                            users[label_cols[i]].append(user)
+                        elif (i == 4 and preds[i] > 0.4):
                             count[label_cols[i]] += 1
                             user = {'name': all_data["user"]["name"], "tweet": all_data["text"]}
                             users[label_cols[i]].append(user)
@@ -100,7 +110,7 @@ def start():
     auth = OAuthHandler(ckey, csecret)
     auth.set_access_token(atoken, asecret)
 
-    twitterStream = Stream(auth, listener(time_limit=20))
+    twitterStream = Stream(auth, listener(time_limit=60))
     twitterStream.sample(languages=['en'])
 
 def getdata():
@@ -117,8 +127,8 @@ def getdata():
     blacklist.append(users)
     res.append(blacklist)
 
-    for key in countState:
-        states.append(countState[key])
+    for key in county:
+        states.append(county[key])
 
     res.append(states)
     print("states" + str(states))
@@ -126,13 +136,16 @@ def getdata():
     return response
 
 def getLocation(data):
+    '''
     output_file = "tweet.json"
     input_file = "tweetLocation.json"
     with open(output_file, 'w') as fo:
         json.dump(data, fo)
-    if cli.main(output_file, input_file):
-        with open(input_file, 'r') as fi:
-            result = json.load(fi)
+    '''
+    ok, result = cli.main(data)
+    if ok:
+        #with open(input_file, 'r') as fi:
+            #result = json.load(fi)
         return result['location']
     else:
         return {}

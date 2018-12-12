@@ -35,3 +35,15 @@ div.row {
     margin-top: 15px;
     margin-bottom: 15px;
 }
+
+path {
+  pointer-events: all;
+}
+path:hover {
+  opacity: 0.50;
+  cursor: pointer;
+}
+
+.grid {
+  width: 100%;
+}
